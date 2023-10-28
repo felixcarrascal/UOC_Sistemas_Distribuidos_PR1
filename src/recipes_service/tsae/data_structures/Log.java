@@ -106,9 +106,16 @@ public class Log implements Serializable{
 	 * equals
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		
-		// return generated automatically. Remove it when implementing your solution 
+	public synchronized boolean equals(Object obj) {
+		if (obj != null) {
+			
+	        if (!(obj instanceof Log))
+	            return false;
+	       
+	        if(this.log.elements().equals(((Log)obj).log.elements()))
+	            return true;
+		}
+
 		return false;
 	}
 
