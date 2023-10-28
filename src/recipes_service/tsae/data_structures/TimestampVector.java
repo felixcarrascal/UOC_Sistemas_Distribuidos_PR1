@@ -67,7 +67,11 @@ public class TimestampVector implements Serializable{
 	public void updateTimestamp(Timestamp timestamp){
 		LSimLogger.log(Level.TRACE, "Updating the TimestampVectorInserting with the timestamp: "+timestamp);
 
-		// ...
+		if (!timestamp.equals(null)) 
+		{
+			// Insertamos el timestamp con su hostid
+			this.timestampVector.put(timestamp.getHostid(), timestamp);
+	    }
 	}
 	
 	/**
@@ -111,8 +115,15 @@ public class TimestampVector implements Serializable{
 	 * equals
 	 */
 	public boolean equals(Object obj){
-		
-		// return generated automatically. Remove it when implementing your solution 
+
+		if (obj != null) {
+
+	        if (!(obj instanceof TimestampVector))								
+	            return false;
+	        
+	        if (this.timestampVector.elements().equals(((TimestampVector)obj).timestampVector.elements())) 
+	            return true;
+		} 
 		return false;
 	}
 
