@@ -71,12 +71,37 @@ public class Log implements Serializable{
 	 * @param op
 	 * @return true if op is inserted, false otherwise.
 	 */
-	public boolean add(Operation op){
-		// ....
+	public synchronized boolean add(Operation op) {
+		Timestamp lastTimestamp;
 		
-		// return generated automatically. Remove it when implementing your solution 
-		return false;
+		// Obtenemos el hostid de la operación
+		String hostId = op.getTimestamp().getHostid();
+		
+		// Obtenemos nuestro hostid
+        List<Operation> operations = log.get(hostId);
+    	
+        // Comprobamos que la operación este instanciada
+        if (operations == null || operations.isEmpty()) 
+        	lastTimestamp = null;
+        else
+        	// Obtenemos el tiempo de la operacion
+        	lastTimestamp = operations.get(operations.size() - 1).getTimestamp();
+        
+         
+        long timestampDifference = op.getTimestamp().compare(lastTimestamp);
+        
+        
+        // Agregamos al log sin son correctos
+        if ((lastTimestamp == null && timestampDifference == 0) || (lastTimestamp != null && timestampDifference == 1)) 
+        {
+            log.get(hostId).add(op);
+            return true;
+        }
+        
+        return false;
+        
 	}
+
 	
 	/**
 	 * Checks the received summary (sum) and determines the operations
