@@ -72,28 +72,26 @@ public class Log implements Serializable{
 	 * @return true if op is inserted, false otherwise.
 	 */
 	public synchronized boolean add(Operation op) {
-		Timestamp lastTimestamp;
-		
-		// Obtenemos el hostid de la operación
-		String hostId = op.getTimestamp().getHostid();
-		
-		// Obtenemos nuestro hostid
-        List<Operation> operations = log.get(hostId);
-    	
-        // Comprobamos que la operación este instanciada
-        if (operations == null || operations.isEmpty()) 
-        	lastTimestamp = null;
-        else
-        	// Obtenemos el tiempo de la operacion
-        	lastTimestamp = operations.get(operations.size() - 1).getTimestamp();
+
+		//Obtenemos hostid de la operación
+        String hostId = op.getTimestamp().getHostid();
         
+        //Obtenemos la lista de operaciones del host
+		List<Operation> operaciones = log.get(hostId);
+
+		//Obtenemos del timestamp de la última operacion
+        Timestamp ultimoTimestamp;
+        if (operaciones == null || operaciones.isEmpty()) { 
+        	ultimoTimestamp = null;
+        } else {
+        	ultimoTimestamp = operaciones.get(operaciones.size() - 1).getTimestamp();
+        }
          
-        long timestampDifference = op.getTimestamp().compare(lastTimestamp);
+        long diferenciaTiempo = op.getTimestamp().compare(ultimoTimestamp);
         
-        
-        // Agregamos al log sin son correctos
-        if ((lastTimestamp == null && timestampDifference == 0) || (lastTimestamp != null && timestampDifference == 1)) 
-        {
+        //Se añade al log si es la primera operación ó el timestamp de la operación pasada
+        //como parámetro es posterior al timestamp de la última operación del log
+        if ((ultimoTimestamp == null && diferenciaTiempo == 0) || (ultimoTimestamp != null && diferenciaTiempo == 1)) {
             log.get(hostId).add(op);
             return true;
         }
@@ -133,14 +131,14 @@ public class Log implements Serializable{
 	@Override
 	public synchronized boolean equals(Object obj) {
 		if (obj != null) {
-			
-	        if (!(obj instanceof Log))
+	        if (!(obj instanceof Log)) {
 	            return false;
+	        }
 	       
-	        if(this.log.elements().equals(((Log)obj).log.elements()))
+	        if(this.log.elements().equals(((Log)obj).log.elements())) {
 	            return true;
+	        }
 		}
-
 		return false;
 	}
 
