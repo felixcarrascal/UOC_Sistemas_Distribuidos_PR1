@@ -25,14 +25,11 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import recipes_service.data.Operation;
-//LSim logging system imports sgeag@2017
-//import lsim.coordinator.LSimCoordinator;
-import edu.uoc.dpcs.lsim.logger.LoggerManager.Level;
-import lsim.library.api.LSimLogger;
 
 /**
  * @author Joan-Manuel Marques, Daniel Lázaro Iglesias
@@ -109,10 +106,31 @@ public class Log implements Serializable{
 	 * @param sum
 	 * @return list of operations
 	 */
-	public List<Operation> listNewer(TimestampVector sum){
+	public synchronized List<Operation> listNewer(TimestampVector sum){
+		List<Operation> result = new Vector<>();
+		String host;
+		List<Operation> ops;
 
-		// return generated automatically. Remove it when implementing your solution 
-		return null;
+		for(ConcurrentHashMap.Entry<String, List<Operation>> entry : log.entrySet()){
+			host = entry.getKey();
+			ops = entry.getValue(); 
+
+			if(! ops.isEmpty()){
+				Timestamp last = ops.get(ops.size() - 1).getTimestamp();
+				if(last.compare(sum.getLast(host)) > 0){
+					if(sum.getLast(host).isNullTimestamp()){
+						result.addAll(ops);
+					} else {
+						for(Operation op : ops){
+							if(op.getTimestamp().compare(sum.getLast(host)) > 0){
+								result.add(op);
+							}
+						}
+					}
+				}
+			}	
+		}
+		return result;
 	}
 	
 	/**
@@ -122,7 +140,8 @@ public class Log implements Serializable{
 	 * ackSummary. 
 	 * @param ack: ackSummary.
 	 */
-	public void purgeLog(TimestampMatrix ack){
+	public void purgeLog(TimestampMatrix ack) {
+
 	}
 
 	/**

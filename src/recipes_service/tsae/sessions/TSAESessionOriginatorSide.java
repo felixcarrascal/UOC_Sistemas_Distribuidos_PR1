@@ -22,12 +22,15 @@ package recipes_service.tsae.sessions;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
-import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import communication.ObjectInputStream_DS;
+import communication.ObjectOutputStream_DS;
+import edu.uoc.dpcs.lsim.logger.LoggerManager.Level;
+import lsim.library.api.LSimLogger;
 import recipes_service.ServerData;
 import recipes_service.activity_simulation.SimulationData;
 import recipes_service.communication.Host;
@@ -36,13 +39,11 @@ import recipes_service.communication.MessageAErequest;
 import recipes_service.communication.MessageEndTSAE;
 import recipes_service.communication.MessageOperation;
 import recipes_service.communication.MsgType;
+import recipes_service.data.AddOperation;
 import recipes_service.data.Operation;
+import recipes_service.data.OperationType;
 import recipes_service.tsae.data_structures.TimestampMatrix;
 import recipes_service.tsae.data_structures.TimestampVector;
-import communication.ObjectInputStream_DS;
-import communication.ObjectOutputStream_DS;
-import edu.uoc.dpcs.lsim.logger.LoggerManager.Level;
-import lsim.library.api.LSimLogger;
 
 /**
  * @author Joan-Manuel Marques
@@ -97,9 +98,16 @@ public class TSAESessionOriginatorSide extends TimerTask{
 			ObjectInputStream_DS in = new ObjectInputStream_DS(socket.getInputStream());
 			ObjectOutputStream_DS out = new ObjectOutputStream_DS(socket.getOutputStream());
 
-			TimestampVector localSummary = null;
-			TimestampMatrix localAck = null;
-
+			TimestampVector localSummary;
+			TimestampMatrix localAck;
+			
+		    synchronized (serverData) {
+                localSummary = serverData.getSummary().clone();
+                serverData.getAck().update(serverData.getId(), localSummary);
+                localAck = serverData.getAck().clone();
+            }
+			
+		    
 			// Send to partner: local's summary and ack
 			Message	msg = new MessageAErequest(localSummary, localAck);
 			msg.setSessionNumber(current_session_number);
@@ -109,22 +117,30 @@ public class TSAESessionOriginatorSide extends TimerTask{
             // receive operations from partner
 			msg = (Message) in.readObject();
 			LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
+			
+			//Generamos una lista para guaradar las operaciones
+			  List<MessageOperation> operations = new ArrayList<>();
+			  
 			while (msg.type() == MsgType.OPERATION){
-				// ...
+				//Nuevo -> Agregamos la operaci�n a la lista
+				operations.add((MessageOperation) msg);
+				
 				msg = (Message) in.readObject();
 				LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
 			}
 
             // receive partner's summary and ack
 			if (msg.type() == MsgType.AE_REQUEST){
-				// ...
+				//Nuevo -> Generamos un mensaje AERequest
+				MessageAErequest aerequestMsg = (MessageAErequest) msg;
+				aerequestMsg.setSessionNumber(current_session_number);
 				
-				// send operations
-				
-				//...
+				//Obtenemos las nuevas operaciones y las añadimos
+				for (Operation op : serverData.getLog().listNewer(aerequestMsg.getSummary())) {
+					msg = new MessageOperation(op);
 					msg.setSessionNumber(current_session_number);
 					out.writeObject(msg);
-					LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] sent message: "+msg);
+				}
 
 				// send and "end of TSAE session" message
 				msg = new MessageEndTSAE();  
@@ -136,7 +152,18 @@ public class TSAESessionOriginatorSide extends TimerTask{
 				msg = (Message) in.readObject();
 				LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
 				if (msg.type() == MsgType.END_TSAE){
-					// 
+					// Nuevo -> Inicio de operaci�n sincronizada
+					synchronized (serverData) {
+                        for (MessageOperation operation : operations) {
+                        	if(operation.getOperation().getType() == OperationType.ADD) {
+                        		serverData.addOperation((AddOperation) operation.getOperation());
+                        	}
+                        }
+
+                        serverData.getSummary().updateMax(aerequestMsg.getSummary());
+                        serverData.getAck().updateMax(aerequestMsg.getAck());
+                        serverData.getLog().purgeLog(serverData.getAck());
+                    }
 				}
 
 			}			

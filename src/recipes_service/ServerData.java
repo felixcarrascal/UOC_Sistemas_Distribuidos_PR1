@@ -252,4 +252,13 @@ public class ServerData {
 	public synchronized void notifyServerConnected(){
 		notifyAll();
 	}
+
+	public void addOperation(AddOperation operation) {
+		if (this.log.add(operation)) {
+			if (!tombstones.contains(operation.getRecipe().getTimestamp())) {
+				this.recipes.add(operation.getRecipe());
+			}
+		}		
+	}
+
 }
