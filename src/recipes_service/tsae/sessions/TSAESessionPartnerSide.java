@@ -78,15 +78,7 @@ public class TSAESessionPartnerSide extends Thread{
 			LSimLogger.log(Level.TRACE, "[TSAESessionPartnerSide] [session: "+current_session_number+"] TSAE session");
 			LSimLogger.log(Level.TRACE, "[TSAESessionPartnerSide] [session: "+current_session_number+"] received message: "+ msg);
 			if (msg.type() == MsgType.AE_REQUEST){
-				//Nuevo
-				  MessageAErequest aerequestMsg = (MessageAErequest) msg;
-				
-				
-				/*
-					out.writeObject(msg);
-					msg.setSessionNumber(current_session_number);
-					LSimLogger.log(Level.TRACE, "[TSAESessionPartnerSide] [session: "+current_session_number+"] sent message: "+ msg);
-*/
+				 MessageAErequest aerequestMsg = (MessageAErequest) msg;
 
 				// send to originator: local's summary and ack
 				TimestampVector localSummary = null;
@@ -104,11 +96,8 @@ public class TSAESessionPartnerSide extends Thread{
                     out.writeObject(msg);
                 }
 				
-				//Creamos una array con las operaciones para sincronizar
+				//Lista que contendrá las operaciones
 				List<MessageOperation> operations = new ArrayList<>();
-				
-				//Fin de nuevo
-			
 				
 				msg = new MessageAErequest(localSummary, localAck);
 				msg.setSessionNumber(current_session_number);
@@ -119,7 +108,7 @@ public class TSAESessionPartnerSide extends Thread{
 				msg = (Message) in.readObject();
 				LSimLogger.log(Level.TRACE, "[TSAESessionPartnerSide] [session: "+current_session_number+"] received message: "+ msg);
 				while (msg.type() == MsgType.OPERATION){
-					//Nuevo-> A�adimos las operaciones a la array
+					//Añadimos operación
 					 operations.add((MessageOperation) msg);
 
 					msg = (Message) in.readObject();
@@ -134,7 +123,7 @@ public class TSAESessionPartnerSide extends Thread{
 		            out.writeObject(msg);					
 					LSimLogger.log(Level.TRACE, "[TSAESessionPartnerSide] [session: "+current_session_number+"] sent message: "+ msg);
 					
-					//Nuevo -> Sincronizamos las nuevas operaciones
+					//Sincronización de operaciones
 					 synchronized (serverData) {
 	                        for (MessageOperation operation : operations) {
 	                        	if (operation.getOperation().getType() == OperationType.ADD) {

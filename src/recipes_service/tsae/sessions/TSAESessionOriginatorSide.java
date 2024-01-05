@@ -118,11 +118,11 @@ public class TSAESessionOriginatorSide extends TimerTask{
 			msg = (Message) in.readObject();
 			LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
 			
-			//Generamos una lista para guaradar las operaciones
-			  List<MessageOperation> operations = new ArrayList<>();
+			//Lista que contendrá las operaciones
+			List<MessageOperation> operations = new ArrayList<>();
 			  
 			while (msg.type() == MsgType.OPERATION){
-				//Nuevo -> Agregamos la operaci�n a la lista
+				//Añadimos operación
 				operations.add((MessageOperation) msg);
 				
 				msg = (Message) in.readObject();
@@ -131,11 +131,11 @@ public class TSAESessionOriginatorSide extends TimerTask{
 
             // receive partner's summary and ack
 			if (msg.type() == MsgType.AE_REQUEST){
-				//Nuevo -> Generamos un mensaje AERequest
+				//Obtenemos el mensaje AERequest
 				MessageAErequest aerequestMsg = (MessageAErequest) msg;
 				aerequestMsg.setSessionNumber(current_session_number);
 				
-				//Obtenemos las nuevas operaciones y las añadimos
+				//Sincronización de operaciones
 				for (Operation op : serverData.getLog().listNewer(aerequestMsg.getSummary())) {
 					msg = new MessageOperation(op);
 					msg.setSessionNumber(current_session_number);
@@ -152,7 +152,7 @@ public class TSAESessionOriginatorSide extends TimerTask{
 				msg = (Message) in.readObject();
 				LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
 				if (msg.type() == MsgType.END_TSAE){
-					// Nuevo -> Inicio de operaci�n sincronizada
+					//Obtención de las operaciones para incluirlas en local
 					synchronized (serverData) {
                         for (MessageOperation operation : operations) {
                         	if(operation.getOperation().getType() == OperationType.ADD) {

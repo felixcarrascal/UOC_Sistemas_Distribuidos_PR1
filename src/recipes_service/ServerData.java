@@ -254,8 +254,8 @@ public class ServerData {
 	}
 
 	public void addOperation(AddOperation operation) {
-		if (this.log.add(operation)) {
-			if (!tombstones.contains(operation.getRecipe().getTimestamp())) {
+		if(this.log.add(operation)) {
+			if(! tombstones.contains(operation.getRecipe().getTimestamp())){
 				this.recipes.add(operation.getRecipe());
 			}
 		}		
