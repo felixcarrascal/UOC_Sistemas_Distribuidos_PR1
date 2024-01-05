@@ -21,11 +21,11 @@
 package recipes_service.tsae.data_structures;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -107,30 +107,27 @@ public class Log implements Serializable{
 	 * @return list of operations
 	 */
 	public synchronized List<Operation> listNewer(TimestampVector sum){
-		List<Operation> result = new Vector<>();
-		String host;
-		List<Operation> ops;
 
-		for(ConcurrentHashMap.Entry<String, List<Operation>> entry : log.entrySet()){
-			host = entry.getKey();
-			ops = entry.getValue(); 
+		 List<Operation> missingOperations = new ArrayList<>();
 
-			if(! ops.isEmpty()){
-				Timestamp last = ops.get(ops.size() - 1).getTimestamp();
-				if(last.compare(sum.getLast(host)) > 0){
-					if(sum.getLast(host).isNullTimestamp()){
-						result.addAll(ops);
-					} else {
-						for(Operation op : ops){
-							if(op.getTimestamp().compare(sum.getLast(host)) > 0){
-								result.add(op);
-							}
-						}
-					}
-				}
-			}	
-		}
-		return result;
+		 	//Recorremos los hos
+	        for (String host : this.log.keySet()) {
+	        	
+	        	//Cogemos los datos del host
+	            List<Operation> operations = this.log.get(host);
+	            Timestamp timestampHost = sum.getLast(host);
+
+	            //Recorremos las operaciones que tiene este host
+	            for (Operation op : operations) {
+	                if (op.getTimestamp().compare(timestampHost) > 0) {
+	                	//No tenemos esta operacion
+	                    missingOperations.add(op);
+	                }
+	            }
+	        }
+	        
+	        //Devolvemos las operaciones que no tenemos
+	        return missingOperations;
 	}
 	
 	/**
@@ -140,15 +137,14 @@ public class Log implements Serializable{
 	 * ackSummary. 
 	 * @param ack: ackSummary.
 	 */
-	public void purgeLog(TimestampMatrix ack) {
-
+	public void purgeLog(TimestampMatrix ack){
 	}
 
 	/**
 	 * equals
 	 */
 	@Override
-	public synchronized boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj != null) {
 	        if (!(obj instanceof Log)) {
 	            return false;

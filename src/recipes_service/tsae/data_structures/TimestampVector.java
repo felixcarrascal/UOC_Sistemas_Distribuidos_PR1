@@ -23,10 +23,10 @@ package recipes_service.tsae.data_structures;
 
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import edu.uoc.dpcs.lsim.logger.LoggerManager.Level;
@@ -59,6 +59,11 @@ public class TimestampVector implements Serializable{
 			timestampVector.put(id, new Timestamp(id, Timestamp.NULL_TIMESTAMP_SEQ_NUMBER));
 		}
 	}
+	
+	//Constructor necesario para el clone
+	private TimestampVector(Map<String, Timestamp> timestampVector) {
+        this.timestampVector = new ConcurrentHashMap<>(timestampVector);
+    }
 
 	/**
 	 * Updates the timestamp vector with a new timestamp. 
@@ -67,17 +72,28 @@ public class TimestampVector implements Serializable{
 	public synchronized void updateTimestamp(Timestamp timestamp){
 		LSimLogger.log(Level.TRACE, "Updating the TimestampVectorInserting with the timestamp: "+timestamp);
 
-		if (!timestamp.equals(null)){
-			// Inserción de timestamp y hostid
-			this.timestampVector.put(timestamp.getHostid(), timestamp);
-	    }
+		timestampVector.put(timestamp.getHostid(),timestamp);
 	}
 	
 	/**
 	 * merge in another vector, taking the elementwise maximum
 	 * @param tsVector (a timestamp vector)
 	 */
-	public void updateMax(TimestampVector tsVector){
+	public synchronized void updateMax(TimestampVector tsVector){
+		//comprobamos si no es nulo
+		if (tsVector!=null) {
+			  for (String host : this.timestampVector.keySet()) {
+				  	//Cogemos el timestamp del host
+		            Timestamp hostTimestamp = tsVector.getLast(host);
+
+		            if (hostTimestamp == null) {
+		                continue;
+		            } else if (this.getLast(host).compare(hostTimestamp) < 0) {
+		            	//Si es menor remplazamos
+		                this.timestampVector.replace(host, hostTimestamp);
+		            }
+		        }
+		}
 	}
 	
 	/**
@@ -87,9 +103,8 @@ public class TimestampVector implements Serializable{
 	 * received.
 	 */
 	public Timestamp getLast(String node){
-		
-		// return generated automatically. Remove it when implementing your solution 
-		return null;
+		//Se implementa que devuelva el ultimo
+		 return this.timestampVector.get(node);
 	}
 	
 	/**
@@ -105,15 +120,13 @@ public class TimestampVector implements Serializable{
 	 * clone
 	 */
 	public TimestampVector clone(){
-		
-		// return generated automatically. Remove it when implementing your solution 
-		return null;
+		 return new TimestampVector(this.timestampVector);
 	}
 	
 	/**
 	 * equals
 	 */
-	public synchronized boolean equals(Object obj){
+	public boolean equals(Object obj){
 		if (obj != null) {
 	        if (!(obj instanceof TimestampVector)) {							
 	            return false;

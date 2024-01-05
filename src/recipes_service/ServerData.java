@@ -253,12 +253,11 @@ public class ServerData {
 		notifyAll();
 	}
 
+	//Sincronización de operaciones (añadir)
 	public void addOperation(AddOperation operation) {
-		if(this.log.add(operation)) {
-			if(! tombstones.contains(operation.getRecipe().getTimestamp())){
-				this.recipes.add(operation.getRecipe());
-			}
-		}		
+	     if (this.log.add(operation)) {
+	            this.recipes.add(operation.getRecipe());
+	        }
+		
 	}
-
 }

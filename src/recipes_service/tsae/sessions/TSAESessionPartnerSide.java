@@ -40,7 +40,6 @@ import recipes_service.communication.MsgType;
 import recipes_service.data.AddOperation;
 import recipes_service.data.Operation;
 import recipes_service.data.OperationType;
-import recipes_service.data.RemoveOperation;
 import recipes_service.tsae.data_structures.TimestampMatrix;
 import recipes_service.tsae.data_structures.TimestampVector;
 
@@ -91,9 +90,7 @@ public class TSAESessionPartnerSide extends Thread{
                 }
 				
 				for (Operation op : serverData.getLog().listNewer(aerequestMsg.getSummary())) {
-					msg = new MessageOperation(op);
-				 	msg.setSessionNumber(current_session_number);
-                    out.writeObject(msg);
+                    out.writeObject(new MessageOperation(op));
                 }
 				
 				//Lista que contendrá las operaciones
@@ -125,16 +122,16 @@ public class TSAESessionPartnerSide extends Thread{
 					
 					//Sincronización de operaciones
 					 synchronized (serverData) {
-	                        for (MessageOperation operation : operations) {
-	                        	if (operation.getOperation().getType() == OperationType.ADD) {
-	                                serverData.addOperation((AddOperation) operation.getOperation());
-	                            }
-	                        }
+                        for (MessageOperation operation : operations) {
+                        	if (operation.getOperation().getType() == OperationType.ADD) {
+                                serverData.addOperation((AddOperation) operation.getOperation());
+                            }
+                        }
 
-	                        serverData.getSummary().updateMax(aerequestMsg.getSummary());
-	                        serverData.getAck().updateMax(aerequestMsg.getAck());
-	                        serverData.getLog().purgeLog(serverData.getAck());
-	                    }
+                        serverData.getSummary().updateMax(aerequestMsg.getSummary());
+                        serverData.getAck().updateMax(aerequestMsg.getAck());
+                        serverData.getLog().purgeLog(serverData.getAck());
+                    }
 				}
 				
 			}

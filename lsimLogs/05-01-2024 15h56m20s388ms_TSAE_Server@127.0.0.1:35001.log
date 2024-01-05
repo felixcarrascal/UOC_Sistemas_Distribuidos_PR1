@@ -1,0 +1,38 @@
+05-01-2024 15:56:20:423 TSAE_Server@127.0.0.1:35001 [INFO] : -- *** --> Server -- local node: [127.0.0.1,35001,Server@127.0.0.1:35001]
+05-01-2024 15:56:20:425 TSAE_Server@127.0.0.1:35001 [INFO] : -- *** --> Server -- participants: [Server@127.0.0.1:35000, Server@127.0.0.1:35001, Server@127.0.0.1:35002]
+05-01-2024 15:56:20:427 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] TSAE session
+05-01-2024 15:56:20:455 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] sent message: MessageAErequest [session: 1, summary=Server@127.0.0.1:35000:   -1000
+Server@127.0.0.1:35001:   -1000
+Server@127.0.0.1:35002:   -1000
+]
+05-01-2024 15:56:20:457 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] TSAE session
+05-01-2024 15:56:20:457 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] received message: MessageAErequest [session: 1, summary=Server@127.0.0.1:35000:   -1000
+Server@127.0.0.1:35001:   -1000
+Server@127.0.0.1:35002:   -1000
+]
+05-01-2024 15:56:20:458 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] sent message: MessageAErequest [session: 1, summary=null]
+05-01-2024 15:56:20:477 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] TSAE session
+05-01-2024 15:56:20:477 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] received message: MessageAErequest [session: 1, summary=Server@127.0.0.1:35000:   -1000
+Server@127.0.0.1:35001:   -1000
+Server@127.0.0.1:35002:   -1000
+]
+05-01-2024 15:56:20:478 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] sent message: MessageAErequest [session: 1, summary=null]
+05-01-2024 15:56:20:497 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] received message: MessageAErequest [session: 1, summary=null]
+05-01-2024 15:56:20:498 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] sent message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:542 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] received message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:542 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 1] End TSAE session
+05-01-2024 15:56:20:542 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] TSAE session
+05-01-2024 15:56:20:545 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] received message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:545 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] sent message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:545 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] End TSAE session
+05-01-2024 15:56:20:546 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] sent message: MessageAErequest [session: 2, summary=Server@127.0.0.1:35000:   -1000
+Server@127.0.0.1:35001:   -1000
+Server@127.0.0.1:35002:   -1000
+]
+05-01-2024 15:56:20:565 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] received message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:565 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] sent message: MessageEndTSAE [session: 1]
+05-01-2024 15:56:20:565 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionPartnerSide] [session: 1] End TSAE session
+05-01-2024 15:56:20:597 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] received message: MessageAErequest [session: 2, summary=null]
+05-01-2024 15:56:20:597 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] sent message: MessageEndTSAE [session: 2]
+05-01-2024 15:56:20:642 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] received message: MessageEndTSAE [session: 2]
+05-01-2024 15:56:20:642 TSAE_Server@127.0.0.1:35001 [TRACE] : [TSAESessionOriginatorSide] [session: 2] End TSAE session

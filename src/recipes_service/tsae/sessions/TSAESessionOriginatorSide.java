@@ -137,9 +137,7 @@ public class TSAESessionOriginatorSide extends TimerTask{
 				
 				//Sincronización de operaciones
 				for (Operation op : serverData.getLog().listNewer(aerequestMsg.getSummary())) {
-					msg = new MessageOperation(op);
-					msg.setSessionNumber(current_session_number);
-					out.writeObject(msg);
+					out.writeObject(op);
 				}
 
 				// send and "end of TSAE session" message
@@ -152,17 +150,19 @@ public class TSAESessionOriginatorSide extends TimerTask{
 				msg = (Message) in.readObject();
 				LSimLogger.log(Level.TRACE, "[TSAESessionOriginatorSide] [session: "+current_session_number+"] received message: "+msg);
 				if (msg.type() == MsgType.END_TSAE){
-					//Obtención de las operaciones para incluirlas en local
+					// Sincronizar operaciones
 					synchronized (serverData) {
                         for (MessageOperation operation : operations) {
-                        	if(operation.getOperation().getType() == OperationType.ADD) {
-                        		serverData.addOperation((AddOperation) operation.getOperation());
-                        	}
+                            if (operation.getOperation().getType() == OperationType.ADD) {
+                                serverData.addOperation((AddOperation) operation.getOperation());
+                            } 
                         }
+//                        System.out.println("Originator - implemented all operations");
 
                         serverData.getSummary().updateMax(aerequestMsg.getSummary());
                         serverData.getAck().updateMax(aerequestMsg.getAck());
                         serverData.getLog().purgeLog(serverData.getAck());
+//                        System.out.println("Originator - updated Summary and Ack");
                     }
 				}
 
